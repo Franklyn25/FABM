@@ -55,9 +55,9 @@ module fabm_standard_variables
    end type
 
    type, extends(type_base_standard_variable) :: type_domain_specific_standard_variable
-      type (type_universal_standard_variable), pointer :: universal => null()
    contains
       procedure :: typed_resolve => domain_specific_standard_variable_typed_resolve
+      procedure :: universal => domain_specific_standard_variable_universal
    end type
 
    type, extends(type_domain_specific_standard_variable) :: type_interior_standard_variable
@@ -160,7 +160,6 @@ contains
       standard_variable%name = name
       standard_variable%units = units
       standard_variable%aggregate_variable = universal%aggregate_variable
-      standard_variable%universal => universal
       call add(standard_variable)
    end subroutine
 
@@ -260,6 +259,25 @@ contains
 #endif
       end select
    end function
+
+   function domain_specific_standard_variable_universal(self) result(universal)
+      class (type_domain_specific_standard_variable), intent(in), target :: self
+      class (type_universal_standard_variable), pointer                  :: universal
+
+      type (type_standard_variable_node), pointer :: node
+
+      universal => null()
+      node => standard_variables%first
+      do while (associated(node))
+         select type (standard_variable => node%p)
+         class is (type_universal_standard_variable)
+            if (associated(standard_variable%pin_interior, self) .or. associated(standard_variable%pat_bottom, self) .or. &
+                associated(standard_variable%pat_surface, self) .or. associated(standard_variable%pat_interfaces, self)) &
+               universal => standard_variable
+         end select
+         node => node%next
+      end do
+   end function domain_specific_standard_variable_universal
 
    subroutine base_standard_variable_assert_resolved(self)
       class (type_base_standard_variable), intent(in) :: self

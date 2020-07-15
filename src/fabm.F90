@@ -2208,6 +2208,7 @@ contains
       type (type_set)                             :: dependencies, dependencies_hz, dependencies_scalar
       type (type_standard_variable_set)           :: standard_variable_set
       type (type_standard_variable_node), pointer :: standard_variable_node
+      class (type_universal_standard_variable), pointer :: universal_standard_variable
 
       ! Build a list of all master variables (those that not have been coupled)
       link => self%root%links%first
@@ -2221,8 +2222,9 @@ contains
       aggregate_variable_list = collect_aggregate_variables(self%root)
       aggregate_variable => aggregate_variable_list%first
       do while (associated(aggregate_variable))
-         if (associated(aggregate_variable%standard_variable%universal)) then
-            if (aggregate_variable%standard_variable%universal%conserved) call standard_variable_set%add(aggregate_variable%standard_variable%universal)
+         universal_standard_variable => aggregate_variable%standard_variable%universal()
+         if (associated(universal_standard_variable)) then
+            if (universal_standard_variable%conserved) call standard_variable_set%add(universal_standard_variable)
          end if
          aggregate_variable => aggregate_variable%next
       end do

@@ -601,6 +601,7 @@ contains
       type (type_model_list_node),         pointer :: child
       type (type_standard_variable_set)           :: standard_variable_set
       type (type_standard_variable_node), pointer :: standard_variable_node
+      class (type_universal_standard_variable), pointer :: universal_standard_variable
 
       ! Process child models
       child => self%children%first
@@ -616,8 +617,9 @@ contains
       ! Get list of conserved quantities (map to universal=domain-independent variables where possible)
       aggregate_variable => aggregate_variable_list%first
       do while (associated(aggregate_variable))
-         if (associated(aggregate_variable%standard_variable%universal)) then
-            if (aggregate_variable%standard_variable%universal%conserved) call standard_variable_set%add(aggregate_variable%standard_variable%universal)
+         universal_standard_variable => aggregate_variable%standard_variable%universal()
+         if (associated(universal_standard_variable)) then
+            if (universal_standard_variable%conserved) call standard_variable_set%add(universal_standard_variable)
          end if
          aggregate_variable => aggregate_variable%next
       end do
