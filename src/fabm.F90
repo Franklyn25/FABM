@@ -2222,7 +2222,7 @@ contains
       aggregate_variable_list = collect_aggregate_variables(self%root)
       aggregate_variable => aggregate_variable_list%first
       do while (associated(aggregate_variable))
-         universal_standard_variable => aggregate_variable%standard_variable%universal()
+         call aggregate_variable%standard_variable%universal(universal_standard_variable)
          if (associated(universal_standard_variable)) then
             if (universal_standard_variable%conserved) call standard_variable_set%add(universal_standard_variable)
          end if

@@ -260,7 +260,7 @@ contains
       end select
    end function
 
-   function domain_specific_standard_variable_universal(self) result(universal)
+   subroutine domain_specific_standard_variable_universal(self, universal)
       class (type_domain_specific_standard_variable), intent(in), target :: self
       class (type_universal_standard_variable), pointer                  :: universal
 
@@ -277,7 +277,7 @@ contains
          end select
          node => node%next
       end do
-   end function domain_specific_standard_variable_universal
+   end subroutine domain_specific_standard_variable_universal
 
    subroutine base_standard_variable_assert_resolved(self)
       class (type_base_standard_variable), intent(in) :: self
