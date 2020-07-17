@@ -889,7 +889,7 @@ contains
       type (type_interior_standard_variable), intent(in) :: standard_variable
       type (type_fabm_interior_variable_id)              :: id
 
-      id%variable => get_variable_by_standard_variable(self, standard_variable%resolve())
+      id%variable => get_variable_by_standard_variable(self, base_standard_variable_resolve(standard_variable))
    end function get_interior_variable_id_sn
 
    ! --------------------------------------------------------------------------
@@ -913,7 +913,7 @@ contains
       class (type_horizontal_standard_variable), intent(in) :: standard_variable
       type (type_fabm_horizontal_variable_id)               :: id
 
-      id%variable => get_variable_by_standard_variable(self, standard_variable%resolve())
+      id%variable => get_variable_by_standard_variable(self, base_standard_variable_resolve(standard_variable))
    end function get_horizontal_variable_id_sn
 
    ! --------------------------------------------------------------------------
@@ -937,7 +937,7 @@ contains
       type (type_global_standard_variable), intent(in) :: standard_variable
       type (type_fabm_scalar_variable_id)              :: id
 
-      id%variable => get_variable_by_standard_variable(self, standard_variable%resolve())
+      id%variable => get_variable_by_standard_variable(self, base_standard_variable_resolve(standard_variable))
    end function get_scalar_variable_id_sn
 
    ! --------------------------------------------------------------------------
@@ -2222,7 +2222,7 @@ contains
       aggregate_variable_list = collect_aggregate_variables(self%root)
       aggregate_variable => aggregate_variable_list%first
       do while (associated(aggregate_variable))
-         call aggregate_variable%standard_variable%universal(universal_standard_variable)
+         call domain_specific_standard_variable_universal(aggregate_variable%standard_variable, universal_standard_variable)
          if (associated(universal_standard_variable)) then
             if (universal_standard_variable%conserved) call standard_variable_set%add(universal_standard_variable)
          end if

@@ -148,7 +148,7 @@ contains
       node => all_standard_variables%first
       do while (associated(node))
 #ifndef NDEBUG
-         call node%p%assert_resolved()
+         call base_standard_variable_assert_resolved(node%p)
 #endif
          first_link => null()
          link => model%links%first
@@ -617,7 +617,7 @@ contains
       ! Get list of conserved quantities (map to universal=domain-independent variables where possible)
       aggregate_variable => aggregate_variable_list%first
       do while (associated(aggregate_variable))
-         call aggregate_variable%standard_variable%universal(universal_standard_variable)
+         call domain_specific_standard_variable_universal(aggregate_variable%standard_variable, universal_standard_variable)
          if (associated(universal_standard_variable)) then
             if (universal_standard_variable%conserved) call standard_variable_set%add(universal_standard_variable)
          end if

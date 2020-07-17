@@ -168,7 +168,7 @@ contains
       coupling%slave => slave
       if (present(master_name)) coupling%master_name = master_name
       if (present(master_standard_variable)) then
-         standard_variable => master_standard_variable%resolve()
+         standard_variable => base_standard_variable_resolve(master_standard_variable)
          select type (standard_variable)
          class is (type_universal_standard_variable)
             select case (coupling%slave%target%domain)

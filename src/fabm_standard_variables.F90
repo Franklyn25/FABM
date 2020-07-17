@@ -37,6 +37,7 @@ module fabm_standard_variables
    public type_standard_variable_node, type_standard_variable_set
    public standard_variables, initialize_standard_variables
 
+   public base_standard_variable_resolve, base_standard_variable_assert_resolved, domain_specific_standard_variable_typed_resolve, domain_specific_standard_variable_universal
    ! ====================================================================================================
    ! Data types that contain all metadata needed to describe standard variables.
    ! ====================================================================================================
@@ -49,15 +50,9 @@ module fabm_standard_variables
       logical            :: aggregate_variable = .false. ! Whether biogeochemical models can contribute (add to) this variable.
                                                          ! If .true., this variable is always available with a default value of 0.
       logical   :: resolved = .false.
-   contains
-      procedure :: resolve         => base_standard_variable_resolve
-      procedure :: assert_resolved => base_standard_variable_assert_resolved
    end type
 
    type, extends(type_base_standard_variable) :: type_domain_specific_standard_variable
-   contains
-      procedure :: typed_resolve => domain_specific_standard_variable_typed_resolve
-      procedure :: universal => domain_specific_standard_variable_universal
    end type
 
    type, extends(type_domain_specific_standard_variable) :: type_interior_standard_variable
@@ -190,7 +185,7 @@ contains
 
       class (type_base_standard_variable), pointer :: presolved
 
-      presolved => self%resolve()
+      presolved => base_standard_variable_resolve(self)
       select type (presolved)
       class is (type_universal_standard_variable)
          p => presolved
@@ -248,7 +243,7 @@ contains
 
       class (type_base_standard_variable), pointer :: pbase
 
-      pbase => self%resolve()
+      pbase => base_standard_variable_resolve(self)
       select type (pbase)
       class is (type_domain_specific_standard_variable)
          p => pbase
@@ -298,13 +293,13 @@ contains
       type (type_standard_variable_node), pointer :: node
 
 #ifndef NDEBUG
-      call standard_variable%assert_resolved()
+      call base_standard_variable_assert_resolved(standard_variable)
 #endif
       standard_variable_set_contains_variable = .true.
       node => self%first
       do while (associated(node))
 #ifndef NDEBUG
-         call node%p%assert_resolved()
+         call base_standard_variable_assert_resolved(node%p)
 #endif
          if (associated(node%p, standard_variable)) return
          node => node%next
@@ -334,7 +329,7 @@ contains
       type (type_standard_variable_node), pointer :: node
 
 #ifndef NDEBUG
-      call standard_variable%assert_resolved()
+      call base_standard_variable_assert_resolved(standard_variable)
 #endif
 
       if (self%contains(standard_variable)) return

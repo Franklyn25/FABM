@@ -33,7 +33,7 @@ module fabm_types
    public standard_variables
    public type_interior_standard_variable, type_horizontal_standard_variable, type_global_standard_variable, &
       type_universal_standard_variable, type_bottom_standard_variable, type_surface_standard_variable, &
-      initialize_standard_variables, type_standard_variable_node, type_base_standard_variable, type_standard_variable_set
+      initialize_standard_variables, type_standard_variable_node, type_base_standard_variable, type_standard_variable_set, base_standard_variable_resolve, domain_specific_standard_variable_universal
 
    ! Variable identifier types used by biogeochemical models
    public type_variable_id
@@ -999,7 +999,7 @@ contains
             'target "' // trim(target%name) // '" is not an aggregate variable.')
       if (.not. associated(variable_id%link)) call self%fatal_error('add_to_aggregate_variable', &
          'variable added to ' // trim(target%name) // ' has not been registered')
-      standard_variable => target%resolve()
+      standard_variable => base_standard_variable_resolve(target)
       select type (standard_variable)
       class is (type_universal_standard_variable)
          select case(variable_id%link%target%domain)
@@ -1029,7 +1029,7 @@ contains
 
       if (.not. target%aggregate_variable) call self%fatal_error('add_constant_to_aggregate_variable', &
             'target "' // trim(target%name) // '" is not an aggregate variable.')
-      standard_variable => target%typed_resolve()
+      standard_variable => domain_specific_standard_variable_typed_resolve(target)
 
       link => null()
       select type (standard_variable)
@@ -1342,7 +1342,7 @@ contains
 
       call create_coupling_task(self, link, task)
       if (.not. associated(task)) return   ! We already have a user-specified task, which takes priority
-      task%master_standard_variable => master%typed_resolve()
+      task%master_standard_variable => domain_specific_standard_variable_typed_resolve(master)
    end subroutine request_standard_coupling_for_link
 
    subroutine request_standard_coupling_for_id(self, id, master)
@@ -1725,7 +1725,7 @@ contains
          variable%prefill_value = fill_value
       end if
       if (present(standard_variable)) then
-         pstandard_variable => standard_variable%resolve()
+         pstandard_variable => base_standard_variable_resolve(standard_variable)
          select type (pstandard_variable)
          class is (type_domain_specific_standard_variable)
             call variable%standard_variables%add(pstandard_variable)
