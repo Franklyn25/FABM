@@ -48,7 +48,7 @@ module fabm_standard_variables
                                           ! (http://cfconventions.org/standard-names.html)
       logical            :: aggregate_variable = .false. ! Whether biogeochemical models can contribute (add to) this variable.
                                                          ! If .true., this variable is always available with a default value of 0.
-      logical, private   :: resolved = .false.
+      logical   :: resolved = .false.
    contains
       procedure :: resolve         => base_standard_variable_resolve
       procedure :: assert_resolved => base_standard_variable_assert_resolved
